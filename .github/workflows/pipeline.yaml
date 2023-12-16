@@ -1,4 +1,4 @@
-name: Pipeline
+name: CI/CD pipeline
 
 on:
   push:
@@ -12,28 +12,25 @@ on:
 env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
   SAM_TEMPLATE: template.yaml
+
   TESTING_STACK_NAME: logbook-app-test
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-16OZ73NM855ID
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-1WGED6IENHL4
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-uapdj48ac4s6
-  # If there are functions with "Image" PackageType in your template,
-  # uncomment the line below and add "--image-repository ${TESTING_IMAGE_REPOSITORY}" to
-  # testing "sam package" and "sam deploy" commands.
-  # TESTING_IMAGE_REPOSITORY = '0123456789.dkr.ecr.region.amazonaws.com/repository-name'
   TESTING_REGION: eu-west-1
+
   PROD_STACK_NAME: logbook-app-prod
   PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-prod-pip-PipelineExecutionRole-QUF9BARIM8GP
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-prod-CloudFormationExecutionR-176F16MW0I3JM
   PROD_ARTIFACTS_BUCKET: aws-sam-cli-managed-prod-pipeline-artifactsbucket-146ptawh45p6x
-  # If there are functions with "Image" PackageType in your template,
-  # uncomment the line below and add "--image-repository ${PROD_IMAGE_REPOSITORY}" to
-  # prod "sam package" and "sam deploy" commands.
-  # PROD_IMAGE_REPOSITORY = '0123456789.dkr.ecr.region.amazonaws.com/repository-name'
+
   PROD_REGION: eu-west-1
 
 jobs:
   test:
+    name: Run unit tests
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +38,8 @@ jobs:
       - run: |
           # trigger the tests here
 
-  delete-feature:
+  delete:
+    name: Delete resources
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
     runs-on: ubuntu-latest
     steps:
@@ -70,11 +68,8 @@ jobs:
             --region ${TESTING_REGION} \
             --no-prompts
 
-  build-and-deploy-feature:
-    # this stage is triggered only for feature branches (feature*),
-    # which will build the stack and deploy to a stack named with branch name.
-    # https://github.com/actions/setup-python
-    # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
+  build-and-deploy:
+    name: Build and deploy resources
     if: startsWith(github.ref, 'refs/heads/feature')
     needs: [test]
     runs-on: ubuntu-latest
@@ -107,6 +102,7 @@ jobs:
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
 
   build-and-package:
+    name: Build and package artifacts
     if: github.ref == 'refs/heads/main'
     needs: [test]
     runs-on: ubuntu-latest
@@ -166,7 +162,7 @@ jobs:
           path: packaged-prod.yaml
 
   deploy-testing:
-    name: Deploy testing
+    name: Deploy to testing environment
     if: github.ref == 'refs/heads/main'
     needs: [build-and-package]
     runs-on: ubuntu-latest
@@ -200,6 +196,7 @@ jobs:
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
 
   integration-test:
+    name: Run integration tests
     if: github.ref == 'refs/heads/main'
     needs: [deploy-testing]
     runs-on: ubuntu-latest
@@ -209,12 +206,10 @@ jobs:
           # trigger the integration tests here
 
   deploy-prod:
+    name: Deploy to production environment
     if: github.ref == 'refs/heads/main'
     needs: [integration-test]
     runs-on: ubuntu-latest
-    # Configure GitHub Action Environment to have a manual approval step before deployment to production
-    # https://docs.github.com/en/actions/reference/environments
-    # environment: <configured-environment>
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
