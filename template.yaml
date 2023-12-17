@@ -35,7 +35,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: logbook-account-handler-lfn
-      CodeUri: account/
+      CodeUri: account_handler/
       Handler: app.lambda_handler
       Runtime: python3.11
       Architectures:
