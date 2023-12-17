@@ -71,8 +71,6 @@ Resources:
       FifoQueue: True
       QueueName: logbook-account-queue-sqs.fifo
 
-
-# TODO add all outputs
 Outputs:
   AccountUserPool:
     Description: "User Pool for Cognito for registered user accounts"

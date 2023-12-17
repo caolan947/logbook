@@ -1,16 +1,19 @@
 import boto3
 import json
+import os
+
+client_id = os.environ['account_user_pool_client']
+
+client = boto3.client('cognito-idp')
+print(f"Created boto3 client for Cognito")
 
 def lambda_handler(event, context):
-    client = boto3.client('cognito-idp')
-    print(f"Created boto3 client for Cognito")
-
     body = json.loads(event['Records'][0]['body'])
     print(f"Unpacked SQS message body for action {body['action']} for username {body['username']} with password {body['password']}")
 
     try:
         res = client.sign_up(
-            ClientId='oktpn5c2mvmcv97mgg08rgcci',
+            ClientId=client_id,
             Username=body['username'],
             Password=body['password']
         )

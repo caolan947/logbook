@@ -1,13 +1,14 @@
 import boto3
 import json
+import os
 
-queue_url = 'https://sqs.eu-west-1.amazonaws.com/376949755107/logbook-account-queue-sqs.fifo'
-msg_group = 'default-group'
+queue_url = os.environ['account_queue']
+msg_group = os.environ['queue_default_group']
+
+client = boto3.client('sqs')
+print(f"Created boto3 client for SQS")
 
 def lambda_handler(event, context):
-    client = boto3.client('sqs')
-    print(f"Created boto3 client for SQS")
-
     event = json.loads(event['body'])
     message_body = {
         'action': 'register_account',
