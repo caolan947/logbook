@@ -8,6 +8,15 @@ Description: >
 Globals:
   Function:
     Timeout: 30
+    Handler: app.lambda_handler
+    Runtime: python3.11
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        queue_default_group: msg_group
+        account_queue: https://sqs.eu-west-1.amazonaws.com/376949755107/logbook-account-queue-sqs.fifo
+        account_user_pool_client: !Ref AccountUserPoolClient
 
 Resources:
   AccountUserPool:
@@ -27,8 +36,8 @@ Resources:
   AccountUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      UserPoolId: eu-west-1_CvqcKB3v2
-      ClientName: AccountUserPoolClient
+      UserPoolId: !Ref AccountUserPool
+      ClientName: logbook-account-upc
       GenerateSecret: false
 
   AccountHandlerFunction:
@@ -37,9 +46,6 @@ Resources:
       FunctionName: logbook-account-handler-lfn
       CodeUri: account_handler/
       Handler: app.lambda_handler
-      Runtime: python3.11
-      Architectures:
-        - x86_64
       Events:
         Account:
           Type: Api
@@ -52,10 +58,6 @@ Resources:
     Properties:
       FunctionName: logbook-account-save-lfn
       CodeUri: account_save/
-      Handler: app.lambda_handler
-      Runtime: python3.11
-      Architectures:
-        - x86_64
       Events:
         MySQSEvent:
           Type: SQS
@@ -70,16 +72,26 @@ Resources:
       QueueName: logbook-account-queue-sqs.fifo
 
 
+# TODO add all outputs
 Outputs:
+  AccountUserPool:
+    Description: "User Pool for Cognito for registered user accounts"
+    Value: !GetAtt AccountUserPool.UserPoolId
+  AccountUserPoolClient:
+    Description: !Join [ '', [ "User Pool client for cognito for ", !GetAtt AccountUserPool.UserPoolId] ]
+    Value: !GetAtt AccountUserPool.UserPoolId
   AccountApi:
     Description: "API Gateway endpoint URL for Prod stage for Account Handler function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/account/"
   AccountHandlerFunction:
-    Description: "Account Handler Lambda Function ARN"
+    Description: "Account domain handler Lambda Function ARN"
     Value: !GetAtt AccountHandlerFunction.Arn
+  AccountSaveFunction:
+    Description: "Account domain save Lambda Function ARN"
+    Value: !GetAtt AccountSaveFunction.Arn
   AccountHandlerFunctionIamRole:
     Description: "Implicit IAM Role created for Account Handler function"
     Value: !GetAtt AccountHandlerFunctionRole.Arn
-  AccountUserPoolClient:
-    Description: "User pool client created for accounts user pool"
+  AccountQueue:
+    Description: "SQS FIFO queue for account domain"
     Value: !Ref AccountUserPoolClient
