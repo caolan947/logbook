@@ -194,6 +194,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+env/*
 
 # Spyder project settings
 .spyderproject
@@ -237,11 +238,10 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Build folder
+# SAM stuff
 
 */build/*
 .aws-sam/*
+events/*
 
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
-
-env/*
