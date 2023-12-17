@@ -7,12 +7,34 @@ Description: >
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 30
 
 Resources:
+  AccountUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: logbook-account-upl
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+
+  AccountUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: eu-west-1_CvqcKB3v2
+      ClientName: AccountUserPoolClient
+      GenerateSecret: false
+
   AccountHandlerFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: logbook-account-handler-lfn
       CodeUri: account/
       Handler: app.lambda_handler
       Runtime: python3.11
@@ -25,6 +47,29 @@ Resources:
             Path: /account
             Method: post
 
+  AccountSaveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: logbook-account-save-lfn
+      CodeUri: account_save/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AccountQueue.Arn
+
+  AccountQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      ContentBasedDeduplication: True
+      FifoQueue: True
+      QueueName: logbook-account-queue-sqs.fifo
+
+
 Outputs:
   AccountApi:
     Description: "API Gateway endpoint URL for Prod stage for Account Handler function"
@@ -34,4 +79,7 @@ Outputs:
     Value: !GetAtt AccountHandlerFunction.Arn
   AccountHandlerFunctionIamRole:
     Description: "Implicit IAM Role created for Account Handler function"
-    Value: !GetAtt HAccountHandlerFunctionRole.Arn
+    Value: !GetAtt AccountHandlerFunctionRole.Arn
+  AccountUserPoolClient:
+    Description: "User pool client created for accounts user pool"
+    Value: !Ref AccountUserPoolClient
