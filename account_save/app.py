@@ -2,6 +2,8 @@ import boto3
 import json
 import os
 
+# TODO unit test, integration test
+
 client_id = os.environ['account_user_pool_client']
 
 client = boto3.client('cognito-idp')
@@ -26,13 +28,19 @@ def lambda_handler(event, context):
         print(msg)
 
         return {
-            "error": True,
-            "message": msg,
-            "data": e
+            "statusCode": 500,
+            "body": json.dumps({
+                "error": True,
+                "message": msg,
+                "data": repr(e)
+            })
         }
 
     return {
-        "error": False,
-        "message": msg,
-        "data": res
+        "statusCode": 200,
+        "body": json.dumps({
+            "error": False,
+            "message": msg,
+            "data": res
+        })
     }
