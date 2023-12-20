@@ -5,6 +5,14 @@ Description: >
 
   Sample SAM Template for logbook-app
 
+Parameters:
+  ACCOUNTQUEUE:
+    Type: String
+    Default: logbook-account-queue-sqs.fifo
+  DEFAULTMSGGROUP:
+    Type: String
+    Default: msg_group
+
 Globals:
   Function:
     Timeout: 30
@@ -14,8 +22,8 @@ Globals:
       - x86_64
     Environment:
       Variables:
-        queue_default_group: msg_group
-        account_queue: https://sqs.eu-west-1.amazonaws.com/376949755107/logbook-account-queue-sqs.fifo
+        queue_default_group: !Ref DEFAULTMSGGROUP
+        account_queue: !Ref ACCOUNTQUEUE
         account_user_pool_client: !Ref AccountUserPoolClient
 
 Resources:
@@ -69,27 +77,4 @@ Resources:
     Properties:
       ContentBasedDeduplication: True
       FifoQueue: True
-      QueueName: logbook-account-queue-sqs.fifo
-
-Outputs:
-  AccountUserPool:
-    Description: "User Pool for Cognito for registered user accounts"
-    Value: !GetAtt AccountUserPool.UserPoolId
-  AccountUserPoolClient:
-    Description: !Join [ '', [ "User Pool client for cognito for ", !GetAtt AccountUserPool.UserPoolId] ]
-    Value: !GetAtt AccountUserPool.UserPoolId
-  AccountApi:
-    Description: "API Gateway endpoint URL for Prod stage for Account Handler function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/account/"
-  AccountHandlerFunction:
-    Description: "Account domain handler Lambda Function ARN"
-    Value: !GetAtt AccountHandlerFunction.Arn
-  AccountSaveFunction:
-    Description: "Account domain save Lambda Function ARN"
-    Value: !GetAtt AccountSaveFunction.Arn
-  AccountHandlerFunctionIamRole:
-    Description: "Implicit IAM Role created for Account Handler function"
-    Value: !GetAtt AccountHandlerFunctionRole.Arn
-  AccountQueue:
-    Description: "SQS FIFO queue for account domain"
-    Value: !Ref AccountUserPoolClient
+      QueueName: !Ref ACCOUNTQUEUE
