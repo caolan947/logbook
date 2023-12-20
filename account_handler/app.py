@@ -2,6 +2,8 @@ import boto3
 import json
 import os
 
+# TODO unit test, integration test
+
 queue_url = os.environ['account_queue']
 msg_group = os.environ['queue_default_group']
 
@@ -18,7 +20,6 @@ def lambda_handler(event, context):
     print(f"Formed message_body {message_body} to send to queue {queue_url} in group {msg_group}")
 
     try:
-
         res = client.send_message(
             QueueUrl=queue_url,
             MessageBody=json.dumps(message_body),
@@ -33,13 +34,19 @@ def lambda_handler(event, context):
         print(msg)
 
         return {
-            "error": True,
-            "message": msg,
-            "data": e
+            "statusCode": 500,
+            "body": json.dumps({
+                "error": True,
+                "message": msg,
+                "data": repr(e)
+            })
         }
 
     return {
-        "error": False,
-        "message": msg,
-        "data": res
+        "statusCode": 200,
+        "body": json.dumps({
+            "error": False,
+            "message": msg,
+            "data": res
+        })
     }
