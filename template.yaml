@@ -5,37 +5,78 @@ Description: >
 
   Sample SAM Template for logbook-app
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+  ACCOUNTQUEUE:
+    Type: String
+    Default: logbook-account-queue-sqs.fifo
+  DEFAULTMSGGROUP:
+    Type: String
+    Default: msg_group
+
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 30
+    Handler: app.lambda_handler
+    Runtime: python3.11
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        AWS_SAM_STACK_NAME: 
+        queue_default_group: !Ref DEFAULTMSGGROUP
+        account_queue: !Ref ACCOUNTQUEUE
+        account_user_pool_client: !Ref AccountUserPoolClient
+        api-endpoint: !Sub "https://${AccountHandlerFunction}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  AccountUserPool:
+    Type: AWS::Cognito::UserPool
     Properties:
-      CodeUri: hello_world/
-      Handler: app.lambda_handler
-      Runtime: python3.11
-      Architectures:
-        - x86_64
-      Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /hello
-            Method: get
+      UserPoolName: logbook-account-upl
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
 
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  AccountUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref AccountUserPool
+      ClientName: logbook-account-upc
+      GenerateSecret: false
+
+  AccountHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: logbook-account-handler-lfn
+      CodeUri: account_handler/
+      Handler: app.lambda_handler
+      Events:
+        Account:
+          Type: Api
+          Properties:
+            Path: /account
+            Method: post
+
+  AccountSaveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: logbook-account-save-lfn
+      CodeUri: account_save/
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AccountQueue.Arn
+
+  AccountQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      ContentBasedDeduplication: True
+      FifoQueue: True
+      QueueName: !Ref ACCOUNTQUEUE

@@ -34,9 +34,18 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - run: |
-          # trigger the tests here
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+      - name: Execute unit tests1
+        run: |
+          python -m unittest discover -s tests.unit
 
   delete:
     name: Delete resources
@@ -194,6 +203,11 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+      
+      - name: List resources in the testing account
+        shell: bash
+        run: |
+          sam list resources --stack-name logbook-app-test --output table
 
   integration-test:
     name: Run integration tests
@@ -203,7 +217,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          # trigger the integration tests here
+          python -m unittest tests\integration\account_handler\test_app.py
 
   deploy-prod:
     name: Deploy to production environment
@@ -239,3 +253,8 @@ jobs:
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
+
+      - name: List resources in the production account
+        shell: bash
+        run: |
+          sam list resources --stack-name logbook-app-prod --output table
