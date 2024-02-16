@@ -54,7 +54,7 @@ class TestAccountHandlerApp(unittest.TestCase):
         self.fake_sqs_send_message_error_true = {
             "error": True,
             "message": f"An unexpected error occurred when sending message to SQS queue and raised exception {repr(self.fake_exception)}",
-            "data": repr(self.fake_exception)
+            "data": self.fake_exception
         } 
 
     @patch('account_handler.app.Response')
@@ -104,7 +104,7 @@ class TestAccountHandlerApp(unittest.TestCase):
 
         mock_client.send_message.side_effect = self.fake_exception
 
-        expected_result = self.fake_sqs_send_message_error_false
+        expected_result = self.fake_sqs_send_message_error_true
         actual_result = app.sqs_send_message(self.loaded_body)
 
         with self.subTest():

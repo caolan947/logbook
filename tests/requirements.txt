@@ -1,3 +1,5 @@
-pytest
-pytest-mock
+unittest
 boto3
+moto
+os
+aws_lambda_context
