@@ -22,9 +22,11 @@ Globals:
       - x86_64
     Environment:
       Variables:
+        AWS_SAM_STACK_NAME: 
         queue_default_group: !Ref DEFAULTMSGGROUP
         account_queue: !Ref ACCOUNTQUEUE
         account_user_pool_client: !Ref AccountUserPoolClient
+        api-endpoint: !Sub "https://${AccountHandlerFunction}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
 
 Resources:
   AccountUserPool:
