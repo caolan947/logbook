@@ -2,8 +2,6 @@ import boto3
 import json
 import os
 
-# TODO unit test, integration test
-
 queue_url = os.environ["account_queue"]
 msg_group = os.environ["queue_default_group"]
 

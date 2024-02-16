@@ -2,17 +2,19 @@ from unittest import TestCase
 import os
 import requests
 
-# TODO clean up created resources from testing
+import boto3
+
 class TestApiGateway(TestCase):
 
     def setUp(self):
+        self.api_endpoint = os.environ['api-endpoint']
+        self.username = "test1@email.com"
 
+        self.event = {"username": self.username, "password": "password1"}
 
-        self.api_endpoint = 'https://v33bcr3lbl.execute-api.eu-west-1.amazonaws.com/Prod'
-        #self.api_endpoint = os.environ['api-endpoint']
-        #self.api_endpoint = 'http://127.0.0.1:3000/account/Prod'
-
-        self.event = {"username": "test5@email.com", "password": "password"}
+    def tearDown(self):
+        client = boto3.client("cognito-idp",  region_name="eu-west-1")
+        client.admin_delete_user(UserPoolId=os.environ["queue_default_group"], Username=self.username)
 
     def test_api_gateway(self):
         headers = headers = {'Content-type': 'application/json', 'Accept':'application/json'}
