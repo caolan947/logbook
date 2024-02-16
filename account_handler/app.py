@@ -7,7 +7,7 @@ import os
 queue_url = os.environ["account_queue"]
 msg_group = os.environ["queue_default_group"]
 
-client = boto3.client("sqs")
+client = boto3.client("sqs", region_name="eu-west-1")
 print(f"Created boto3 client for SQS")
 
 def lambda_handler(event, context):

@@ -22,7 +22,7 @@ class TestAccountHandlerApp(unittest.TestCase):
         }
         self.loaded_body = {"username": self.fake_username, "password": self.fake_password}
 
-        self.fake_client = boto3.client('sqs', region_name='eu-west-1')
+        self.fake_client = boto3.client('sqs', region_name="eu-west-1")
         self.fake_queue = self.fake_client.create_queue(
             QueueName='fake_queue.fifo',
             Attributes={'FifoQueue': 'true', 'ContentBasedDeduplication': 'true'
