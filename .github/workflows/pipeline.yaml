@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          # trigger the tests here
+        python -m unittest discover -s tests.unit
 
   delete:
     name: Delete resources
@@ -208,7 +208,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          # trigger the integration tests here
+          python -m unittest tests\integration\account_handler\test_app.py
 
   deploy-prod:
     name: Deploy to production environment
