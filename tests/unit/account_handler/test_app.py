@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 import boto3
-from moto import mock_sqs
+from moto import mock_aws
 
 import os
 os.environ['account_queue'] = 'fake_queue.fifo'
@@ -13,7 +13,7 @@ from aws_lambda_context import LambdaContext
 
 class TestAccountHandlerApp(unittest.TestCase):
 
-    @mock_sqs
+    @mock_aws
     def setUp(self):
         self.fake_username = 'fake_username@email.com'
         self.fake_password = 'fake_password'
