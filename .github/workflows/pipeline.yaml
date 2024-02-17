@@ -216,7 +216,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@2
+      - uses: actions/setup-python@v2
       - run: |
           python -m unittest discover -s tests.integration.account_handler
 
