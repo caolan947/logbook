@@ -217,7 +217,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          python -m unittest tests\integration\account_handler\test_app.py
+          python -m unittest tests.integration.account_handler
 
   deploy-prod:
     name: Deploy to production environment
