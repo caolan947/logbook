@@ -78,3 +78,4 @@ Resources:
       ContentBasedDeduplication: True
       FifoQueue: True
       QueueName: !Ref ACCOUNTQUEUE
+      
