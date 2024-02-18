@@ -1,6 +1,7 @@
 import boto3
 import json
 import os
+from botocore.exceptions import ClientError
 
 queue_url = os.environ["account_queue"]
 msg_group = os.environ["queue_default_group"]
@@ -15,7 +16,7 @@ def lambda_handler(event, context):
     res = sqs_send_message(unpacked_event.message_body)
 
     if res["error"]:
-        return Response(message=res["message"], status_code=500, data=res["data"]).to_json()
+        return Response(message=res["message"], status_code=500, data=repr(res["data"])).to_json()
 
     return Response(message=res["message"], data=res["data"]).to_json()
 
@@ -36,7 +37,7 @@ def sqs_send_message(message_body):
             "data": res
         } 
     
-    except Exception as e:
+    except ClientError as e:
         msg = f"An unexpected error occurred when sending message to SQS queue and raised exception {repr(e)}"
         print(msg)
 
@@ -66,7 +67,7 @@ class Response():
         
         if self.status_code != 200:
             self.error = True
-            self.data = repr(self.data)
+            self.data = self.data
 
         self.body_content = {
             "error": self.error,
