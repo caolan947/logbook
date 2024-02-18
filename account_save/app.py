@@ -3,33 +3,31 @@ import json
 import os
 from botocore.exceptions import ClientError
 
-# TODO unit test, integration test
-
 client_id = os.environ['account_user_pool_client']
 
 client = boto3.client('cognito-idp')
 print(f"Created boto3 client for Cognito")
 
 def lambda_handler(event, context):
-    unpacked_event = UnpackSqsMessage(event)
-    print(f"Formed message_body {unpacked_event.message_body} to register user in user pool {client_id}")
+    unpacked_message = UnpackSqsMessage(event)
+    print(f"Formed message_body {unpacked_message.message_body} to register user in Cognito user pool {client_id}")
     
-    res = cognito_sign_up(unpacked_event.message_body['username'], unpacked_event.message_body['password'])
+    res = cognito_sign_up(client_id, unpacked_message.message_body['username'], unpacked_message.message_body['password'])
 
     if res["error"]:
         return Response(message=res["message"], status_code=500, data=repr(res["data"])).to_json()
     
     return Response(message=res["message"], data=res["data"]).to_json()
 
-def cognito_sign_up(username, password):
+def cognito_sign_up(user_pool_client_id, username, password):
     try:
         res = client.sign_up(
-            ClientId=client_id,
+            ClientId=user_pool_client_id,
             Username=username,
             Password=password
         )
 
-        msg = f"Successfully signed up new user {username} and got response {res}"
+        msg = f"Successfully signed up new user {username} in Cognito user pool {user_pool_client_id} and got response {res}"
         print(msg)
 
         return {
@@ -42,7 +40,7 @@ def cognito_sign_up(username, password):
         if e.response['Error']['Code'] == 'UsernameExistsException':
             msg = e.response['Error']['Message']
         else:
-            msg ="An unexpected error occurred" 
+            msg = f"An unexpected error occurred when creating user {username} in Cognito user pool {user_pool_client_id} and raised exception {repr(e)}" 
         
         print(msg)  
         
