@@ -1,10 +1,10 @@
 from unittest import TestCase
 import os
 import requests
-
 import boto3
+from botocore.exceptions import ClientError
 
-class TestApiGateway(TestCase):
+class TestAccountHandler(TestCase):
 
     def setUp(self):
         self.api_endpoint = os.environ['api_endpoint']
@@ -12,7 +12,7 @@ class TestApiGateway(TestCase):
 
         self.event = {"username": self.username, "password": "password1"}
 
-    def test_api_gateway(self):
+    def test_account_handler(self):
         headers = headers = {'Content-type': 'application/json', 'Accept':'application/json'}
         
         actual_result = requests.post(self.api_endpoint, json=self.event, headers=headers)
@@ -25,5 +25,5 @@ class TestApiGateway(TestCase):
         
         try:
             client.admin_delete_user(UserPoolId="eu-west-1_jGwoeJ8Q0", Username=self.username)
-        except Exception as e:
+        except ClientError as e:
             pass
