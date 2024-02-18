@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 
 client_id = os.environ['account_user_pool_client']
 
-client = boto3.client('cognito-idp')
+client = boto3.client('cognito-idp', region_name="eu-west-1")
 print(f"Created boto3 client for Cognito")
 
 def lambda_handler(event, context):
