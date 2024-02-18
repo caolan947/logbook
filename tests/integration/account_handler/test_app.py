@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 class TestAccountHandler(TestCase):
 
     def setUp(self):
-        self.api_endpoint = os.environ['api_endpoint']
+        self.api_endpoint = os.environ['API_ENDPOINT']
         self.username = "test1@email.com"
 
         self.event = {"username": self.username, "password": "password1"}
