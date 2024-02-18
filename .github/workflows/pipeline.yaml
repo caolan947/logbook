@@ -216,7 +216,7 @@ jobs:
   integration-test:
     name: Run integration tests
     #if: github.ref == 'refs/heads/main'
-    #needs: [deploy-testing]
+    needs: [deploy-testing]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
