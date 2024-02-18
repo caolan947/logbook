@@ -5,7 +5,6 @@ from botocore.exceptions import ClientError
 import time
 import os
 
-print(os.environ)
 class TestAccountSave(TestCase):
 
     def setUp(self):
