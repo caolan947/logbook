@@ -25,7 +25,7 @@ class TestAccountSaveApp(unittest.TestCase):
 
         self.loaded_body = {"username": self.fake_username, "password": self.fake_password}
 
-        self.fake_client = boto3.client("cognito-idp")
+        self.fake_client = boto3.client("cognito-idp", region_name="eu-west-1")
 
         self.fake_user_pool_response = self.fake_client.create_user_pool(
             PoolName=self.fake_user_pool_name
