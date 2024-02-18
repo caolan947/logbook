@@ -16,9 +16,9 @@ def lambda_handler(event, context):
     res = sqs_send_message(unpacked_event.message_body)
 
     if res["error"]:
-        return Response(message=res["message"], status_code=500, data=repr(res["data"])).to_json()
+        return Response(message=res["message"], status_code=500, data=repr(res["data"])).to_response()
 
-    return Response(message=res["message"], data=res["data"]).to_json()
+    return Response(message=res["message"], data=res["data"]).to_response()
 
 def sqs_send_message(message_body):
     try:
@@ -75,10 +75,10 @@ class Response():
             "data": self.data
         }
 
-    def to_json(self):
+    def to_response(self):
         self.response = {
             "statusCode": self.status_code,
-            "body": self.body_content
+            "body": repr(self.body_content)
         }
         
         print(f"Formed response {self.response}")
