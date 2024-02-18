@@ -13,6 +13,9 @@ env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+  PIPELINE_TESTER_ACCESS_KEY_ID: ${{ secrets.PIPELINE_TEST_AWS_ACCESS_KEY_ID }}
+  PIPELINE_TESTER_SECRET_ACCESS_KEY: ${{ secrets.PIPELINE_TEST_AWS_SECRET_ACCESS_KEY }}
+
   SAM_TEMPLATE: template.yaml
 
   TESTING_STACK_NAME: logbook-app-test
@@ -20,8 +23,6 @@ env:
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-1WGED6IENHL4
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-uapdj48ac4s6
   TESTING_REGION: eu-west-1
-  PIPELINE_TESTER_ACCESS_KEY_ID: ${{ secrets.PIPELINE_TEST_AWS_ACCESS_KEY_ID }}
-  PIPELINE_TESTER_SECRET_ACCESS_KEY: ${{ secrets.PIPELINE_TEST_AWS_SECRET_ACCESS_KEY }}
 
   PROD_STACK_NAME: logbook-app-prod
   PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-prod-pip-PipelineExecutionRole-QUF9BARIM8GP
@@ -228,8 +229,8 @@ jobs:
           pip install -r tests/integration/requirements.txt
       - name: Set environment variables
         run: |
-          set AWS_ACCESS_KEY_ID=${{ env.PIPELINE_TESTER_ACCESS_KEY_ID }}
-          set AWS_SECRET_ACCESS_KEY=${{ env.PIPELINE_TESTER_SECRET_ACCESS_KEY }}
+          set AWS_ACCESS_KEY_ID=${PIPELINE_TESTER_ACCESS_KEY_ID}
+          set AWS_SECRET_ACCESS_KEY=${PIPELINE_TESTER_SECRET_ACCESS_KEY}
           set
       - name: Execute integration tests
         run: |
