@@ -3,6 +3,7 @@ from unittest.mock import patch, Mock
 import boto3
 from moto import mock_aws
 import os
+import json
 
 os.environ['account_queue'] = 'fake_queue.fifo'
 os.environ['queue_default_group'] = 'fake_group'
@@ -71,10 +72,10 @@ class TestAccountHandlerApp(unittest.TestCase):
     def test_lambda_handler(self, mock_unpacked_event, mock_res, mock_Response):
         mock_unpacked_event.return_value = self.fake_unpacked_event
         mock_res.return_value = self.fake_sqs_send_message_error_false
-        mock_Response.return_value.to_json.return_value = {
+        mock_Response.return_value.to_json.return_value = json.loads({
             'statusCode': 200,
             'body': self.fake_sqs_send_message_error_false
-        } 
+        })
 
         expected_result = {
             'statusCode': 200,

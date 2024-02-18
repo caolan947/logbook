@@ -2,3 +2,4 @@ boto3
 moto
 aws_lambda_context
 python-jose
+json
