@@ -1,14 +1,13 @@
 import unittest
 from unittest.mock import patch, Mock
-
 import boto3
 from moto import mock_aws
-
 import os
+
 os.environ['account_queue'] = 'fake_queue.fifo'
 os.environ['queue_default_group'] = 'fake_group'
-from account_handler import app
 
+from account_handler import app
 from aws_lambda_context import LambdaContext
 
 class TestAccountHandlerApp(unittest.TestCase):
