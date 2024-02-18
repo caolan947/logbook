@@ -71,14 +71,14 @@ class TestAccountHandlerApp(unittest.TestCase):
     def test_lambda_handler(self, mock_unpacked_event, mock_res, mock_Response):
         mock_unpacked_event.return_value = self.fake_unpacked_event
         mock_res.return_value = self.fake_sqs_send_message_error_false
-        mock_Response.return_value.to_json.return_value = {
+        mock_Response.return_value.to_response.return_value = {
             'statusCode': 200,
-            'body': self.fake_sqs_send_message_error_false
-        } 
+            'body': repr(self.fake_sqs_send_message_error_false)
+        }
 
         expected_result = {
             'statusCode': 200,
-            'body': self.fake_sqs_send_message_error_false
+            'body': repr(self.fake_sqs_send_message_error_false)
         }
         actual_result = app.lambda_handler(self.fake_event, self.fake_context)
         
@@ -86,14 +86,14 @@ class TestAccountHandlerApp(unittest.TestCase):
             self.assertEqual(expected_result, actual_result)
 
         mock_res.return_value = self.fake_sqs_send_message_error_true
-        mock_Response.return_value.to_json.return_value = {
+        mock_Response.return_value.to_response.return_value = {
             'statusCode': 500,
-            'body': self.fake_sqs_send_message_error_true
+            'body': repr(self.fake_sqs_send_message_error_false)
         }
 
         expected_result = {
             'statusCode': 500,
-            'body': self.fake_sqs_send_message_error_true
+            'body': repr(self.fake_sqs_send_message_error_false)
         }
         actual_result = app.lambda_handler(self.fake_event, self.fake_context)
         

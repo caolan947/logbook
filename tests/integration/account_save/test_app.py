@@ -3,6 +3,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 import time
+import os
 
 class TestAccountSave(TestCase):
 
@@ -11,8 +12,8 @@ class TestAccountSave(TestCase):
 
         self.message_body = {"username": self.username, "password": "password1"}
         
-        self.sqs_client = boto3.client("sqs", region_name="eu-west-1")
-        self.cognito_client = boto3.client("cognito-idp", region_name="eu-west-1")
+        self.sqs_client = boto3.client("sqs", region_name="eu-west-1",aws_access_key_id=os.environ['PIPELINE_TESTER_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['PIPELINE_TESTER_SECRET_ACCESS_KEY'])
+        self.cognito_client = boto3.client("cognito-idp", region_name="eu-west-1",aws_access_key_id=os.environ['PIPELINE_TESTER_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['PIPELINE_TESTER_SECRET_ACCESS_KEY'])
 
     def test_account_save(self):
         r = self.sqs_client.send_message(
