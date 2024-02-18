@@ -83,4 +83,4 @@ class Response():
         
         print(f"Formed response {self.response}")
 
-        return self.response
+        return json.loads(self.response)
