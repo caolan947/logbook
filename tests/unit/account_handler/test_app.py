@@ -8,6 +8,7 @@ os.environ['account_queue'] = 'fake_queue.fifo'
 os.environ['queue_default_group'] = 'fake_group'
 
 from account_handler import app
+from botocore.exceptions import ClientError
 from aws_lambda_context import LambdaContext
 
 class TestAccountHandlerApp(unittest.TestCase):
@@ -42,7 +43,15 @@ class TestAccountHandlerApp(unittest.TestCase):
                 'password': self.fake_password
             })
 
-        self.fake_exception = Exception("Some error")
+        self.fake_exception = ClientError(
+            operation_name='Test', 
+            error_response={
+                'Error': {
+                    'Code': 'SomeError', 
+                    'Message': 'This is an error'
+                }
+            }
+        )
 
         self.fake_sqs_send_message_error_false = {
             "error": False,
