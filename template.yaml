@@ -13,7 +13,7 @@ Parameters:
     Type: String
     Default: msg_group
 
-Globals:
+  Globals:
   Function:
     Timeout: 30
     Handler: app.lambda_handler
