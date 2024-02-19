@@ -25,20 +25,16 @@ env:
   TESTING_REGION: eu-west-1
   API_ENDPOINT: https://bu36a7o261.execute-api.eu-west-1.amazonaws.com/Prod/account
 
-  PROD_STACK_NAME: logbook-app-prod
-  PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-prod-pip-PipelineExecutionRole-QUF9BARIM8GP
-  PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::376949755107:role/aws-sam-cli-managed-prod-CloudFormationExecutionR-176F16MW0I3JM
-  PROD_ARTIFACTS_BUCKET: aws-sam-cli-managed-prod-pipeline-artifactsbucket-146ptawh45p6x
-
-  PROD_REGION: eu-west-1
-
 jobs:
   test:
-    name: Run unit tests
+    name: Run unit tests and validate IaC
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validate SAM template
+        run: |
+          sam validate --lint
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -231,43 +227,3 @@ jobs:
       - name: Execute integration tests
         run: |
           python -m unittest discover -s tests.integration
-
-  deploy-prod:
-    name: Deploy to production environment
-    if: github.ref == 'refs/heads/main'
-    needs: [integration-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
-      - uses: actions/download-artifact@v3
-        with:
-          name: packaged-prod.yaml
-
-      - name: Assume the prod pipeline user role
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.PROD_REGION }}
-          role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: prod-deployment
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Deploy to production account
-        run: |
-          sam deploy --stack-name ${PROD_STACK_NAME} \
-            --template packaged-prod.yaml \
-            --capabilities CAPABILITY_IAM \
-            --region ${PROD_REGION} \
-            --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
-            --no-fail-on-empty-changeset \
-            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
-
-      - name: List resources in the production account
-        shell: bash
-        run: |
-          sam list resources --stack-name logbook-app-prod --output table
