@@ -8,7 +8,7 @@ logging.basicConfig(format='%(levelname)s %(message)s')
 logging.config.dictConfig({'version': 1, 'disable_existing_loggers': True})
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-logger.handlers[0].setFormatter(logging.Formatter(fmt='[%(levelname)s] | %(filename)s:%(lineno)s - %(funcName)20s() | %(message)s'))
+logger.handlers[0].setFormatter(logging.Formatter(fmt='%(filename)s:%(lineno)s - %(funcName)20s() | [%(levelname)s] %(message)s'))
 
 queue_url = os.environ["account_queue"]
 msg_group = os.environ["queue_default_group"]
