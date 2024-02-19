@@ -2,15 +2,20 @@ import boto3
 import json
 import os
 from botocore.exceptions import ClientError
+import logging, logging.config
+
+logging.basicConfig(format='%(levelname)s %(message)s')
+logging.config.dictConfig({'version': 1, 'disable_existing_loggers': True})
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.handlers[0].setFormatter(logging.Formatter(fmt='%(filename)s:%(lineno)s - %(funcName)20s() | [%(levelname)s] %(message)s'))
 
 client_id = os.environ['account_user_pool_client']
-
-client = boto3.client('cognito-idp', region_name="eu-west-1")
-print(f"Created boto3 client for Cognito")
+client = boto3.client('cognito-idp', region_name=os.environ["region"])
 
 def lambda_handler(event, context):
     unpacked_message = UnpackSqsMessage(event)
-    print(f"Formed message_body {unpacked_message.message_body} to register user in Cognito user pool {client_id}")
+    logger.info(f"Formed message_body {unpacked_message.message_body} to register user in Cognito user pool {client_id}")
     
     res = cognito_sign_up(client_id, unpacked_message.message_body['username'], unpacked_message.message_body['password'])
 
@@ -28,7 +33,7 @@ def cognito_sign_up(user_pool_client_id, username, password):
         )
 
         msg = f"Successfully signed up new user {username} in Cognito user pool {user_pool_client_id} and got response {res}"
-        print(msg)
+        logger.info(msg)
 
         return {
             "error": False,
@@ -42,7 +47,7 @@ def cognito_sign_up(user_pool_client_id, username, password):
         else:
             msg = f"An unexpected error occurred when creating user {username} in Cognito user pool {user_pool_client_id} and raised exception {repr(e)}" 
         
-        print(msg)  
+        logger.error(msg)  
         
         return {
             "error": True,
@@ -52,14 +57,14 @@ def cognito_sign_up(user_pool_client_id, username, password):
 
 class UnpackSqsMessage():
     def __init__(self, event):
-        print(event)
+        logger.info(event)
         self.event = json.loads(event["Records"][0]['body'])
         self.message_body = {
             "username": self.event["username"],
             "password": self.event["password"]
         }
         
-        print(f"Unpacked event {event}")
+        logger.info(f"Unpacked event {event}")
 
 class Response():
     def __init__(self, message, status_code=200, error=False, data=None):
@@ -84,6 +89,6 @@ class Response():
             "body": self.body_content
         }
         
-        print(f"Formed response {self.response}")
+        logger.info(f"Formed response {self.response}")
 
         return self.response

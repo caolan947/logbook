@@ -4,7 +4,8 @@ import boto3
 from moto import mock_aws
 import os
 
-os.environ['account_user_pool_client'] = 'fake_id'
+os.environ["account_user_pool_client"] = "fake_id"
+os.environ["region"] = "eu-west-1"
 
 from account_save import app
 from botocore.exceptions import ClientError
@@ -25,18 +26,18 @@ class TestAccountSaveApp(unittest.TestCase):
 
         self.loaded_body = {"username": self.fake_username, "password": self.fake_password}
 
-        self.fake_client = boto3.client("cognito-idp", region_name="eu-west-1")
+        self.fake_client = boto3.client("cognito-idp", region_name=os.environ["region"])
 
         self.fake_user_pool_response = self.fake_client.create_user_pool(
             PoolName=self.fake_user_pool_name
         )
 
         self.fake_user_pool_client_response = self.fake_client.create_user_pool_client(
-            UserPoolId=self.fake_user_pool_response['UserPool']['Id'],
+            UserPoolId=self.fake_user_pool_response["UserPool"]["Id"],
             ClientName=self.fake_client_name
         )
         
-        self.fake_client_id = self.fake_user_pool_client_response['UserPoolClient']['ClientId']
+        self.fake_client_id = self.fake_user_pool_client_response["UserPoolClient"]["ClientId"]
 
         self.fake_sign_up_response = self.fake_client.sign_up(
             ClientId=self.fake_client_id,
@@ -47,26 +48,26 @@ class TestAccountSaveApp(unittest.TestCase):
         self.fake_unpacked_message = Mock(
             event=self.loaded_body,
             message_body={
-                'username': self.fake_username,
-                'password': self.fake_password
+                "username": self.fake_username,
+                "password": self.fake_password
             })
         
         self.fake_exception = ClientError(
-            operation_name='Test', 
+            operation_name="Test", 
             error_response={
-                'Error': {
-                    'Code': 'SomeError', 
-                    'Message': 'This is an error'
+                "Error": {
+                    "Code": "SomeError", 
+                    "Message": "This is an error"
                 }
             }
         )
 
         self.fake_user_exists_exception = ClientError(
-            operation_name='SignUp', 
+            operation_name="SignUp", 
             error_response={
-                'Error': {
-                    'Code': 'UsernameExistsException', 
-                    'Message': 'An account with the given email already exists.'
+                "Error": {
+                    "Code": "UsernameExistsException", 
+                    "Message": "An account with the given email already exists."
                 }
             }
         )
@@ -89,20 +90,20 @@ class TestAccountSaveApp(unittest.TestCase):
             "data": self.fake_user_exists_exception
         }
 
-    @patch('account_save.app.Response')
-    @patch.object(app, 'cognito_sign_up')
-    @patch('account_save.app.UnpackSqsMessage')
+    @patch("account_save.app.Response")
+    @patch.object(app, "cognito_sign_up")
+    @patch("account_save.app.UnpackSqsMessage")
     def test_lambda_handler(self, mock_unpacked_unpacked_message, mock_res, mock_Response):
         mock_unpacked_unpacked_message.return_value = self.fake_unpacked_message
         mock_res.return_value = self.fake_cognito_sign_up_error_false
         mock_Response.return_value.to_json.return_value = {
-            'statusCode': 200,
-            'body': self.fake_cognito_sign_up_error_false
+            "statusCode": 200,
+            "body": self.fake_cognito_sign_up_error_false
         } 
 
         expected_result = {
-            'statusCode': 200,
-            'body': self.fake_cognito_sign_up_error_false
+            "statusCode": 200,
+            "body": self.fake_cognito_sign_up_error_false
         }
         actual_result = app.lambda_handler(self.fake_event, self.fake_context)
         
@@ -111,20 +112,20 @@ class TestAccountSaveApp(unittest.TestCase):
 
         mock_res.return_value = self.fake_cognito_sign_up_error_true_user_exists
         mock_Response.return_value.to_json.return_value = {
-            'statusCode': 500,
-            'body': self.fake_cognito_sign_up_error_true_user_exists
+            "statusCode": 500,
+            "body": self.fake_cognito_sign_up_error_true_user_exists
         }
 
         expected_result = {
-            'statusCode': 500,
-            'body': self.fake_cognito_sign_up_error_true_user_exists
+            "statusCode": 500,
+            "body": self.fake_cognito_sign_up_error_true_user_exists
         }
         actual_result = app.lambda_handler(self.fake_event, self.fake_context)
         
         with self.subTest():
             self.assertEqual(expected_result, actual_result)
     
-    @patch('account_save.app.client')
+    @patch("account_save.app.client")
     def test_cognito_sign_up(self, mock_client):
         mock_client.sign_up.return_value = self.fake_sign_up_response
 
