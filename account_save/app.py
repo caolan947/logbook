@@ -11,7 +11,7 @@ logger.handlers[0].setFormatter(logging.Formatter(fmt='%(filename)s:%(lineno)s -
 
 client_id = os.environ['account_user_pool_client']
 client = boto3.client('cognito-idp', region_name=os.environ["region"])
-print(f"Created Cognito client in {os.environ["region"]}")
+print(f"Created Cognito client in {os.environ['region']}")
 
 def lambda_handler(event, context):
     unpacked_message = EventFactory(event).get_event_parser()

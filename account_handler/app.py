@@ -12,7 +12,7 @@ logger.handlers[0].setFormatter(logging.Formatter(fmt='%(filename)s:%(lineno)s -
 queue_url = os.environ["account_queue"]
 msg_group = os.environ["queue_default_group"]
 client = boto3.client("sqs", region_name=os.environ["region"])
-print(f"Created SQS client in {os.environ["region"]}")
+print(f"Created SQS client in {os.environ['region']}")
 
 def lambda_handler(event, context):
     unpacked_event = EventFactory(event).get_event_parser()
