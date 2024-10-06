@@ -3,3 +3,4 @@ moto
 aws_lambda_context
 python-jose
 joserfc
+lambdarepy
