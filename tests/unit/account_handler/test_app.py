@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
-import boto3
+import boto3, os
 from moto import mock_aws
-import os
 
 os.environ["account_queue"] = "fake_queue.fifo"
 os.environ["queue_default_group"] = "fake_group"
@@ -68,9 +67,9 @@ class TestAccountHandlerApp(unittest.TestCase):
 
     @patch("account_handler.app.Response")
     @patch.object(app, "sqs_send_message")
-    @patch("account_handler.app.UnpackEvent")
-    def test_lambda_handler(self, mock_unpacked_event, mock_res, mock_Response):
-        mock_unpacked_event.return_value = self.fake_unpacked_event
+    @patch("account_handler.app.EventFactory")
+    def test_lambda_handler(self, mock_event, mock_res, mock_Response):
+        mock_event.return_value.get_event_parser.return_value = self.fake_unpacked_event
         mock_res.return_value = self.fake_sqs_send_message_error_false
         mock_Response.return_value.to_response.return_value = {
             "statusCode": 200,

@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
-import boto3
+import boto3, os
 from moto import mock_aws
-import os
 
 os.environ["account_user_pool_client"] = "fake_id"
 os.environ["region"] = "eu-west-1"
@@ -92,9 +91,9 @@ class TestAccountSaveApp(unittest.TestCase):
 
     @patch("account_save.app.Response")
     @patch.object(app, "cognito_sign_up")
-    @patch("account_save.app.UnpackSqsMessage")
+    @patch("account_save.app.EventFactory")
     def test_lambda_handler(self, mock_unpacked_unpacked_message, mock_res, mock_Response):
-        mock_unpacked_unpacked_message.return_value = self.fake_unpacked_message
+        mock_unpacked_unpacked_message.return_value.get_event_parser.return_value = self.fake_unpacked_message
         mock_res.return_value = self.fake_cognito_sign_up_error_false
         mock_Response.return_value.to_json.return_value = {
             "statusCode": 200,
