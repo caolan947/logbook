@@ -6,6 +6,8 @@ from tests.test_data import TestData
 
 @mock_aws
 class AccountHandlerTestData(TestData):
+
+    @mock_aws
     def __init__(self):
         super().__init__()
 
@@ -17,8 +19,8 @@ class AccountHandlerTestData(TestData):
 
         fake_queue = self.fake_client.create_queue(
             QueueName="fake_queue.fifo",
-            Attributes={"FifoQueue": "true", "ContentBasedDeduplication": "true"
-        })
+            Attributes={"FifoQueue": "true", "ContentBasedDeduplication": "true"}
+        )
 
         self.fake_send_message_response = self.fake_client.send_message(
             QueueUrl=fake_queue["QueueUrl"],

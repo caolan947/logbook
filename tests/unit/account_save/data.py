@@ -4,8 +4,9 @@ from unittest.mock import Mock
 from botocore.exceptions import ClientError
 from tests.test_data import TestData
 
-@mock_aws
 class AccountSaveTestData(TestData):
+
+    @mock_aws
     def __init__(self):
         super().__init__()
 
