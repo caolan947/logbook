@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from tests.test_data import TestData
 
-@mock_aws
 class AccountHandlerTestData(TestData):
 
     @mock_aws
