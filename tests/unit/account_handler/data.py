@@ -2,7 +2,7 @@ import boto3, os
 from moto import mock_aws
 from unittest.mock import Mock
 
-from tests.test_data import TestData
+from logbook.tests.data import TestData
 
 class AccountHandlerTestData(TestData):
 
