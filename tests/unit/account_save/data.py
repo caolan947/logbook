@@ -2,7 +2,7 @@ import boto3, os
 from moto import mock_aws
 from unittest.mock import Mock
 from botocore.exceptions import ClientError
-from logbook.tests.data import TestData
+from tests.data import TestData
 
 class AccountSaveTestData(TestData):
 
