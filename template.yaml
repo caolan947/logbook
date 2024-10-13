@@ -79,3 +79,49 @@ Resources:
       ContentBasedDeduplication: True
       FifoQueue: True
       QueueName: !Ref ACCOUNTQUEUE
+
+  GenericLambdaPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: logbook-generic-lambda-iamp
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: "*"
+      Roles:
+        - !Ref AccountIAMRole
+
+  AccountIAMPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: logbook-account-iamp
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 
+            - sqs:SendMessage
+            - cognito-idp:SignUp
+            Resource:
+            - !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:logbook-account-queue-sqs.fifo"
+            - !Sub "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:*"
+      Roles:
+        - !Ref AccountIAMRole
+
+  AccountIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
