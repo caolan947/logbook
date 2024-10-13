@@ -15,9 +15,9 @@ print(f"Created Cognito client in {os.environ['region']}")
 
 def lambda_handler(event, context):
     unpacked_message = EventFactory(event).get_event_parser()
-    logger.info(f"Formed message_body {unpacked_message.message_body} to register user in Cognito user pool {client_id}")
+    logger.info(f"Formed message_body {unpacked_message.event} to register user in Cognito user pool {client_id}")
     
-    res = cognito_sign_up(client_id, unpacked_message.message_body['username'], unpacked_message.message_body['password'])
+    res = cognito_sign_up(client_id, unpacked_message.event['username'], unpacked_message.event['password'])
 
     if res["error"]:
         return Response(message=res["message"], status_code=500, data=repr(res["data"])).to_json()

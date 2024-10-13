@@ -16,9 +16,9 @@ print(f"Created SQS client in {os.environ['region']}")
 
 def lambda_handler(event, context):
     event = EventFactory(event).get_event_parser()
-    logger.info(f"Formed message_body {event.message_body} to send to queue {queue_url} in group {msg_group}")
+    logger.info(f"Formed message_body {event.event} to send to queue {queue_url} in group {msg_group}")
     
-    res = sqs_send_message(event.message_body)
+    res = sqs_send_message(event.event)
 
     if res["error"]:
         return Response(message=res["message"], status_code=500, data=repr(res["data"])).to_response()
