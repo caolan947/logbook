@@ -44,7 +44,7 @@ class TestAccountSave(TestCase):
         try:
             self.cognito_client.admin_delete_user(
                 UserPoolId=f"{os.environ['region']}_jGwoeJ8Q0",
-                Username=self.username
+                Username=self.test_data.fake_username
             )
 
         except ClientError as e:
