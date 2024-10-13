@@ -95,7 +95,7 @@ Resources:
             ]
           - Resource: "*"
       Roles:
-        - !Ref AccountCognitoIAmRole
+        - !Ref AccountIAMRole
 
   AccountIAMPolicy:
     Type: AWS::IAM::Policy
@@ -112,7 +112,7 @@ Resources:
             - "arn:aws:sqs:eu-west-1:376949755107:logbook-account-queue-sqs.fifo"
             - "arn:aws:cognito-idp:eu-west-1:376949755107:*"
       Roles:
-        - !Ref AccountCognitoIAmRole
+        - !Ref AccountIAMRole
 
   AccountIAMRole:
     Type: AWS::IAM::Role
