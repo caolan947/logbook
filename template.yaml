@@ -93,8 +93,8 @@ Resources:
             - logs:CreateLogStream
             - logs:PutLogEvents
           - Resource: "*"
-      Roles:
-        - !Ref AccountIAMRole
+      # Roles:
+      #   - !Ref AccountIAMRole
 
   # AccountIAMPolicy:
   #   Type: AWS::IAM::Policy
