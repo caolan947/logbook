@@ -93,8 +93,8 @@ Resources:
             - logs:CreateLogStream
             - logs:PutLogEvents
           - Resource: "*"
-      # Roles:
-      #   - !Ref AccountIAMRole
+      Roles:
+        - !Ref AccountIAMRole
 
   # AccountIAMPolicy:
   #   Type: AWS::IAM::Policy
@@ -113,15 +113,15 @@ Resources:
   #     Roles:
   #       - !Ref AccountIAMRole
 
-  # AccountIAMRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Service:
-  #               - ec2.amazonaws.com
-  #           Action:
-  #             - sts:AssumeRole
+  AccountIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
