@@ -96,32 +96,32 @@ Resources:
       Roles:
         - !Ref AccountIAMRole
 
-  AccountIAMPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: logbook-account-sqs-iamp
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-          - Action: 
-            - sqs:SendMessage
-            - cognito-idp:SignUp
-          - Resource:
-            - "arn:aws:sqs:eu-west-1:376949755107:logbook-account-queue-sqs.fifo"
-            - "arn:aws:cognito-idp:eu-west-1:376949755107:*"
-      Roles:
-        - !Ref AccountIAMRole
+  # AccountIAMPolicy:
+  #   Type: AWS::IAM::Policy
+  #   Properties:
+  #     PolicyName: logbook-account-sqs-iamp
+  #     PolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #         - Action: 
+  #           - sqs:SendMessage
+  #           - cognito-idp:SignUp
+  #         - Resource:
+  #           - "arn:aws:sqs:eu-west-1:376949755107:logbook-account-queue-sqs.fifo"
+  #           - "arn:aws:cognito-idp:eu-west-1:376949755107:*"
+  #     Roles:
+  #       - !Ref AccountIAMRole
 
-  AccountIAMRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - ec2.amazonaws.com
-            Action:
-              - sts:AssumeRole
+  # AccountIAMRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - ec2.amazonaws.com
+  #           Action:
+  #             - sts:AssumeRole
