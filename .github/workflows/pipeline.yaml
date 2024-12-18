@@ -81,7 +81,7 @@ jobs:
 
   build-and-deploy:
     name: Build and deploy resources
-    if: startsWith(github.ref, 'v-*')
+    if: startsWith(github.ref, 'refs/tags/v-')
     needs: [test]
     runs-on: ubuntu-latest
     steps:
